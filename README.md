@@ -1,16 +1,14 @@
-# DCorr-Nav
-DCorr-Nav: Bridging Perception and Action with Direction-Aware Correlation for Image-Goal Navigation
-
+# CompNav
+CompNav: Training a Perception-Comparison-Action Policy for Image-Goal Navigation
 ## Abstract
-Recent works in image-goal navigation typically involve learning a perception-to-action navigation policy: they first capture semantic features of the goal image and egocentric image independently and then pass them to the policy network for action prediction. Despite a remarkable series of work efforts on visual representations, there are some challenges in terms of navigation efficiency and robustness for these semantic feature-dependent methods. In this paper, we are working to address these challenges by proposing a direction-aware correlation-dependent method~(DCorr-Nav). Specifically, we construct correlations between the features extracted in the perception step and pass the correlation information to the policy network, i.e., training a perception-correlation-action policy. We gradually reinforce the construction of correlations with three versions and eventually developing a powerful DCorr-Nav. Extensive evaluation of the DCorr-Nav on 3 benchmark datasets~(Gibson, HM3D, and MP3D) shows the superior performance in terms of navigation efficiency~(SPL). And it significantly outperforms previous state-of-the-art methods across all metrics~(SPL, SR) under the “user-matched goal” setting, showing potential for real-world applications.
-![](figs/methods.png)
+Recent works in image-goal navigation typically involve learning a perception-action navigation policy. They first capture the semantic features of the goal image and the egocentric image independently and then pass them to the policy network for action prediction. Despite a remarkable series of efforts on improving visual representations, some challenges still exist for these methods: (1) Semantic feature vectors inadequately convey valid direction information for navigation, resulting in inefficient and superfluous actions; (2) Performance decreases dramatically when encountering viewpoint inconsistencies caused by differences in camera settings between training and application.
+In this paper, we endeavor to overcome these challenges by constantly comparing the goal image with current observations during the navigation process, drawing inspiration from human-intuitive navigation. Specifically, we design a correlation-based model that explicitly compares the goal image and the current observation in the perception step and passes the comparison information to the policy network, \emph{i.e.}, training a perception-comparison-action navigation policy~(CompNav). We gradually enhance the comparison modeling by using more fine-grained cross-correlation and introducing direction-aware correlation to provide precise direction information for navigation. Extensive evaluation of the CompNav on 3 benchmark datasets~(Gibson, HM3D, and MP3D) shows superior performance in terms of navigation efficiency~(SPL). In addition, CompNav significantly outperforms previous state-of-the-art methods across all metrics~(SPL, SR) under the “user-matched goal” setting, showing potential for real-world applications. 
 
-## Install
 ### Installing on the host machine
 ```bash
 # create conda env
-conda create -n DCorr-Nav python=3.8
-conda activate DCorr-Nav
+conda create -n CompNav python=3.8
+conda activate CompNav
 conda install habitat-sim=0.2.2 withbullet headless -c conda-forge -c aihabitat
 pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 -f https://download.pytorch.org/whl/torch_stable.html
 
@@ -25,10 +23,6 @@ pip install requirements.txt
 ```
 
 ## Data preparation
-<!-- 
-| ObjectNav   |   Gibson     | train    |  [objectnav_gibson_train](https://utexas.box.com/s/7qtqqkxa37l969qrkwdn0lkwitmyropp)    | `./data/datasets/zer/objectnav/gibson/v1/` |
-| ObjectNav   |   Gibson     | val    |  [objectnav_gibson_val](https://utexas.box.com/s/wu28ms025o83ii4mwfljot1soj5dc7qo)    | `./data/datasets/zer/objectnav/gibson/v1/` | -->
-
 ### Datasets
 Follow the [official guidance](https://github.com/facebookresearch/habitat-sim/blob/main/DATASETS.md#gibson-and-3dscenegraph-datasets) to download `Gibson`, `HM3D`, and `MP3D` scene datas. And follow FGPrompt download the dataset.zip. 
 ```
@@ -54,7 +48,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 run.py 
 --overwrite 
 --exp-config 
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,DCorr-Nav 
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,CompNav 
 --run-type 
 train 
 --model-dir 
@@ -74,7 +68,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,DCorr-Nav,eval
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,CompNav,eval
 --run-type
 eval
 --model-dir
@@ -91,7 +85,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,DCorr-Nav,eval
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset,sensors,CompNav,eval
 --run-type
 eval
 --model-dir
@@ -116,7 +110,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config 
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-hm3d,sensors,DCorr-Nav,eval 
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-hm3d,sensors,CompNav,eval 
 --run-type 
 eval 
 --model-dir 
@@ -135,7 +129,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config 
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-hm3d,sensors,DCorr-Nav,eval 
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-hm3d,sensors,CompNav,eval 
 --run-type 
 eval 
 --model-dir 
@@ -159,7 +153,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config 
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-mp3d,sensors,DCorr-Nav,eval
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-mp3d,sensors,CompNav,eval
 --run-type 
 eval 
 --model-dir 
@@ -178,7 +172,7 @@ MAGNUM_LOG=quiet HABITAT_SIM_LOG=quiet python -m torch.distributed.launch
 --master_addr=127.0.0.1 
 run.py 
 --exp-config 
-exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-mp3d,sensors,DCorr-Nav,eval
+exp_config/ddppo_imagenav_gibson.yaml,policy,reward,dataset-mp3d,sensors,CompNav,eval
 --run-type 
 eval 
 --model-dir 
